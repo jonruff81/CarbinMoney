@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Carbin Investments</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div class="main-wrapper"> <!-- Added wrapper -->
+    <div class="container">
+        <h1>Carbin Investments</h1>
+
+        <div class="initial-conditions">
+            <h2>Initial Conditions</h2>
+            <p>Bank Loan: $750,000.00</p>
+            <p>Johnny's Money: $250,000.00</p>
+            <p><strong>Total Starting Capital: $1,000,000.00</strong></p>
+            <p>Investment Period: 2 Years</p>
+        </div>
+
+        <form id="calculator-form">
+            <h2>Enter Your Details</h2>
+            <label for="firstName">First Name:</label>
+            <input type="text" id="firstName" required><br>
+
+            <label for="lastName">Last Name:</label>
+            <input type="text" id="lastName" required><br>
+
+            <label for="projectCost">Project Cost ($):</label>
+            <input type="number" id="projectCost" step="0.01" required><br>
+
+            <label for="laborCost">Labor Cost ($):</label>
+            <input type="number" id="laborCost" step="0.01" required><br>
+
+            <label for="cycleTime">Cycle Time (Weeks):</label>
+            <input type="number" id="cycleTime" step="1" required><br>
+
+            <button type="submit">Calculate Profit</button>
+        </form>
+
+        <div id="results" style="display: none;">
+            <h2>Results for <span id="resultName"></span></h2>
+            <p>Total Cost Per Unit: $<span id="resultTotalCost"></span></p>
+            <p>Profit Per Unit (10%): $<span id="resultProfitPerCycle"></span></p>
+            <p>Number of Cycles Completed: <span id="resultNumCycles"></span></p>
+            <p>Total Units Produced (2 Years): <span id="resultTotalUnits"></span></p>
+            <p><strong>Total Estimated Profit (2 Years): $<span id="resultTotalProfit"></span></strong></p>
+            <p><i>Note: This calculation reinvests profits from each cycle and stops if capital is insufficient for the next cycle's cost.</i></p>
+        </div>
+
+        <div id="leaderboard">
+            <h2>Top 3 Results</h2>
+            <ul id="leaderboard-list">
+                <!-- Leaderboard entries will be populated by script.js -->
+            </ul>
+            <button id="reset-leaderboard-button" class="reset-button">Reset Leaderboard</button>
+        </div>
+    </div> <!-- End .container -->
+</div> <!-- End .main-wrapper -->
+
+    <script src="script.js"></script>
+</body>
+</html>
