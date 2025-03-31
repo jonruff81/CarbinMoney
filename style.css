@@ -7,15 +7,15 @@ body {
 
 .main-wrapper {
     display: flex;
-    gap: 30px; /* Space between calculator and leaderboard */
-    max-width: 1000px; /* Adjust max-width to accommodate both sections */
+    gap: 20px; /* Space between sections */
+    max-width: 1200px; /* Adjust max-width for three sections */
     margin: auto;
     align-items: flex-start; /* Align items to the top */
 }
 
 .container {
-    flex: 2; /* Calculator takes up more space */
-    max-width: 600px; /* Keep original max-width for the calculator part */
+    flex: 3; /* Calculator takes up more space */
+    /* max-width: 600px; Removed fixed max-width to allow flex sizing */
     background: #fff;
     padding: 20px;
     border-radius: 8px;
@@ -23,15 +23,38 @@ body {
 }
 
 #leaderboard {
-    flex: 1; /* Leaderboard takes less space */
+    flex: 2; /* Leaderboard takes medium space */
     background: #fff;
     padding: 20px;
     border-radius: 8px;
     box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-    min-width: 250px; /* Ensure leaderboard has some minimum width */
+    min-width: 220px; /* Adjust min-width slightly */
     display: flex; /* Use flexbox for leaderboard content */
     flex-direction: column; /* Stack items vertically */
 }
+
+#instructions {
+    flex: 2; /* Instructions take similar space to leaderboard */
+    background: #003366; /* Dark blue background */
+    color: #ffffff; /* White text */
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    min-width: 220px; /* Ensure instructions have some minimum width */
+}
+
+#instructions h2 {
+    color: #ffffff; /* White heading */
+    text-align: center;
+    margin-top: 0;
+    margin-bottom: 15px;
+}
+
+#instructions p {
+    margin-bottom: 10px;
+    font-size: 0.95em;
+}
+
 
 h1, h2 {
     text-align: center;
@@ -173,14 +196,15 @@ button[type="submit"]:hover {
 
 
 /* Responsive adjustments */
-@media (max-width: 768px) {
+@media (max-width: 992px) { /* Adjusted breakpoint for three columns */
     .main-wrapper {
         flex-direction: column;
         gap: 20px;
     }
-    .container, #leaderboard {
+    .container, #leaderboard, #instructions { /* Apply to all three sections */
         max-width: 100%; /* Allow full width on smaller screens */
         flex: none; /* Reset flex property */
+        min-width: unset; /* Remove min-width on small screens */
     }
     .reset-button {
         align-self: stretch; /* Make button full width */
