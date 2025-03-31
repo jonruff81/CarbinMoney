@@ -12,93 +12,121 @@ function formatInteger(num) {
     return num.toLocaleString();
 }
 
-const LEADERBOARD_KEY = 'profitCalculatorLeaderboard';
-const MAX_ENTRIES_PER_USER = 3;
-const MAX_LEADERBOARD_SIZE = 3; // Overall top entries to show
+const LEADERBOARD_KEY = 'profitCalculatorLeaderboard'; // No longer used
+const MAX_ENTRIES_PER_USER = 3; // Still used for limiting user-specific entries if desired, but not for overall leaderboard
+
+// Firebase configuration
+const firebaseConfig = {
+  apiKey: "AIzaSyAcCSKENJXu9p7Na_g6_UTKwLKRYkAcLns",
+  authDomain: "carbin-investments.firebaseapp.com",
+  databaseURL: "https://carbin-investments-default-rtdb.firebaseio.com",
+  projectId: "carbin-investments",
+  storageBucket: "carbin-investments.firebasestorage.app",
+  messagingSenderId: "1095890037657",
+  appId: "1:1095890037657:web:b32dca8660483c9eff0108"
+};
+
+// Initialize Firebase
+const app = firebase.initializeApp(firebaseConfig);
+const database = firebase.database();
 
 function getLeaderboard() {
-    const data = localStorage.getItem(LEADERBOARD_KEY);
-    return data ? JSON.parse(data) : [];
+    // Fetch data from Firebase
+    return database.ref('leaderboard').once('value')
+        .then(snapshot => {
+            const data = snapshot.val();
+            // Firebase returns an object; convert it to an array
+            return data ? Object.values(data) : [];
+        })
+        .catch(error => {
+            console.error("Error fetching leaderboard:", error);
+            return []; // Return empty array on error
+        });
 }
 
 function saveLeaderboard(leaderboard) {
-    localStorage.setItem(LEADERBOARD_KEY, JSON.stringify(leaderboard));
+    // This function is no longer needed as we write directly to Firebase
 }
 
-function updateLeaderboard(firstName, lastName, profit, units, projectCost, laborCost, cycleTime) { // Added inputs
+function updateLeaderboard(firstName, lastName, profit, units, projectCost, laborCost, cycleTime) {
     const name = `${firstName} ${lastName}`;
-    let leaderboard = getLeaderboard();
-
-    // Create new entry with input details
     const newEntry = {
         name,
         profit,
         units,
-        projectCost, // Store input
-        laborCost,   // Store input
-        cycleTime,   // Store input
-        timestamp: Date.now()
+        projectCost,
+        laborCost,
+        cycleTime,
+        timestamp: Date.now() // Use Firebase server timestamp if preferred: firebase.database.ServerValue.TIMESTAMP
     };
 
-    // Get entries for the current user and others separately
-    let userEntries = leaderboard.filter(entry => entry.name === name);
-    const otherEntries = leaderboard.filter(entry => entry.name !== name);
-
-    // Add the new entry to the user's entries
-    userEntries.push(newEntry);
-
-    // Sort user's entries by timestamp (newest first)
-    userEntries.sort((a, b) => b.timestamp - a.timestamp);
-
-    // Keep only the top N entries for this user
-    userEntries = userEntries.slice(0, MAX_ENTRIES_PER_USER);
-
-    // Combine back with other entries
-    leaderboard = [...otherEntries, ...userEntries];
-
-    // Sort the entire leaderboard by profit (highest first)
-    leaderboard.sort((a, b) => b.profit - a.profit);
-
-    // Keep only the overall top N entries
-    leaderboard = leaderboard.slice(0, MAX_LEADERBOARD_SIZE);
-
-    saveLeaderboard(leaderboard);
-    displayLeaderboard(); // Update the display
+    // Push the new entry to the 'leaderboard' node in Firebase
+    // Firebase generates a unique key for each entry
+    database.ref('leaderboard').push(newEntry)
+        .then(() => {
+            console.log("Leaderboard updated successfully in Firebase.");
+            // Optionally, trigger a re-display after successful update
+            displayLeaderboard();
+        })
+        .catch(error => {
+            console.error("Error updating leaderboard in Firebase:", error);
+        });
 }
 
 function displayLeaderboard() {
-    const leaderboard = getLeaderboard();
-    const listElement = document.getElementById('leaderboard-list');
-    if (!listElement) return; // Exit if the element doesn't exist yet
+    getLeaderboard()
+        .then(leaderboard => {
+            const listElement = document.getElementById('leaderboard-list');
+            if (!listElement) return; // Exit if the element doesn't exist
 
-    listElement.innerHTML = ''; // Clear previous entries
+            listElement.innerHTML = ''; // Clear previous entries
 
-    if (leaderboard.length === 0) {
-        listElement.innerHTML = '<li>No results yet.</li>';
-        return;
-    }
-
-    leaderboard.forEach((entry, index) => {
-        const li = document.createElement('li');
-        li.innerHTML = `
-            <strong>${index + 1}. ${entry.name}</strong><br>
-            Profit: $${formatNumber(entry.profit)} | Units: ${formatInteger(entry.units)}<br>
-            ${ // Conditionally display inputs if they exist
-                (entry.projectCost !== undefined && entry.laborCost !== undefined && entry.cycleTime !== undefined)
-                ? `<small>Inputs: PC: $${formatNumber(entry.projectCost)} | LC: $${formatNumber(entry.laborCost)} | CT: ${entry.cycleTime}w</small>`
-                : '<small>Inputs: (Not available for this entry)</small>'
+            if (leaderboard.length === 0) {
+                listElement.innerHTML = '<li>No results yet.</li>';
+                return;
             }
-        `;
-        listElement.appendChild(li);
-    });
+
+            // Sort the leaderboard by profit (highest first)
+            leaderboard.sort((a, b) => b.profit - a.profit);
+
+            // Display all entries
+            leaderboard.forEach((entry, index) => {
+                const li = document.createElement('li');
+                // Ensure all expected properties exist before formatting
+                const pc = entry.projectCost !== undefined ? formatNumber(entry.projectCost) : 'N/A';
+                const lc = entry.laborCost !== undefined ? formatNumber(entry.laborCost) : 'N/A';
+                const ct = entry.cycleTime !== undefined ? entry.cycleTime : 'N/A';
+
+                li.innerHTML = `
+                    <strong>${index + 1}. ${entry.name}</strong><br>
+                    Profit: $${formatNumber(entry.profit)} | Units: ${formatInteger(entry.units)}<br>
+                    <small>Inputs: PC: $${pc} | LC: $${lc} | CT: ${ct}w</small>
+                `;
+                listElement.appendChild(li);
+            });
+        })
+        .catch(error => {
+             console.error("Error displaying leaderboard:", error);
+             const listElement = document.getElementById('leaderboard-list');
+             if (listElement) {
+                 listElement.innerHTML = '<li>Error loading leaderboard.</li>';
+             }
+        });
 }
 
 function resetLeaderboard() {
     const code = prompt("Enter reset code:");
     if (code === "Johnny") {
-        localStorage.removeItem(LEADERBOARD_KEY);
-        displayLeaderboard(); // Refresh the display
-        alert("Leaderboard reset successfully.");
+        // Remove all data from the 'leaderboard' node in Firebase
+        database.ref('leaderboard').remove()
+            .then(() => {
+                displayLeaderboard(); // Refresh the display
+                alert("Leaderboard reset successfully.");
+            })
+            .catch(error => {
+                console.error("Error resetting leaderboard:", error);
+                alert("Error resetting leaderboard.");
+            });
     } else if (code !== null) { // Handle case where user clicks cancel
         alert("Incorrect reset code.");
     }
@@ -110,12 +138,12 @@ document.addEventListener('DOMContentLoaded', () => {
     // Display leaderboard on initial load
     displayLeaderboard();
 
-    // Add event listener for the reset button (will be added in HTML)
+    // Add event listener for the reset button
     const resetButton = document.getElementById('reset-leaderboard-button');
     if (resetButton) {
         resetButton.addEventListener('click', resetLeaderboard);
     } else {
-        console.error("Reset button not found in HTML."); // Add error handling
+        console.error("Reset button not found in HTML.");
     }
 
 
@@ -129,7 +157,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const laborCost = parseFloat(document.getElementById('laborCost').value);
         const cycleTime = parseInt(document.getElementById('cycleTime').value);
 
-        // Basic validation (remains the same)
+        // Basic validation
         if (!firstName || !lastName) {
             alert('Please enter both first and last name.');
             return;
@@ -139,7 +167,7 @@ document.addEventListener('DOMContentLoaded', () => {
             return;
         }
 
-        // Constants & Initial State (remains the same)
+        // Constants & Initial State
         const investmentPeriodWeeks = 2 * 52;
         const profitMargin = 0.10;
         let currentCapital = 1000000.00;
@@ -149,7 +177,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const totalCostPerUnit = projectCost + laborCost;
         const maxPossibleCycles = Math.floor(investmentPeriodWeeks / cycleTime);
 
-        // Simulation Loop (remains the same)
+        // Simulation Loop
         for (let i = 0; i < maxPossibleCycles; i++) {
             const unitsThisCycle = Math.floor(currentCapital / totalCostPerUnit);
             if (unitsThisCycle > 0) {
@@ -168,16 +196,16 @@ document.addEventListener('DOMContentLoaded', () => {
 
         // Display results with formatting
         document.getElementById('resultName').textContent = `${firstName} ${lastName}`;
-        document.getElementById('resultTotalCost').textContent = formatNumber(totalCostPerUnit); // Cost per unit
-        document.getElementById('resultProfitPerCycle').textContent = formatNumber(totalCostPerUnit * profitMargin); // Profit per unit
-        document.getElementById('resultNumCycles').textContent = formatInteger(cyclesCompleted); // Cycles completed
-        document.getElementById('resultTotalUnits').textContent = formatInteger(totalUnitsProduced); // Total units
-        document.getElementById('resultTotalProfit').textContent = formatNumber(totalAccumulatedProfit); // Total profit
+        document.getElementById('resultTotalCost').textContent = formatNumber(totalCostPerUnit);
+        document.getElementById('resultProfitPerCycle').textContent = formatNumber(totalCostPerUnit * profitMargin);
+        document.getElementById('resultNumCycles').textContent = formatInteger(cyclesCompleted);
+        document.getElementById('resultTotalUnits').textContent = formatInteger(totalUnitsProduced);
+        document.getElementById('resultTotalProfit').textContent = formatNumber(totalAccumulatedProfit);
 
         // Show the results section
         document.getElementById('results').style.display = 'block';
 
-        // Update and display the leaderboard, passing input values
+        // Update leaderboard in Firebase (which will trigger display update)
         updateLeaderboard(firstName, lastName, totalAccumulatedProfit, totalUnitsProduced, projectCost, laborCost, cycleTime);
     });
 });
