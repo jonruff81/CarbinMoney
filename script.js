@@ -48,7 +48,7 @@ function saveLeaderboard(leaderboard) {
     // This function is no longer needed as we write directly to Firebase
 }
 
-function updateLeaderboard(firstName, lastName, profit, units, projectCost, cycleTime) {
+function updateLeaderboard(firstName, lastName, profit, units, projectCost,  cycleTime) {
     const name = `${firstName} ${lastName}`;
     const newEntry = {
         name,
@@ -245,7 +245,7 @@ document.addEventListener('DOMContentLoaded', () => {
         console.log("Results section displayed."); // Log 14
 
         // Update leaderboard in Firebase (which will trigger display update)
-        updateLeaderboard(firstName, lastName, totalAccumulatedProfit, totalUnitsProduced, projectCost, 0, cycleTime);
+        updateLeaderboard(firstName, lastName, totalAccumulatedProfit, totalUnitsProduced, projectCost, cycleTime);
         console.log("Leaderboard update triggered."); // Log 15
     });
 });
