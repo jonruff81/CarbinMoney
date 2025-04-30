@@ -9,12 +9,11 @@
 <body>
 <div class="main-wrapper"> <!-- Added wrapper -->
     <div class="container">
-        <h1>Carbin Investments</h1>
+        <h1>Construction Cycle</h1>
 
         <div class="initial-conditions">
             <h2>Initial Conditions</h2>
-            <p>Starting Capitol: $5,000,000.00</p>
-            <p><strong>Total Starting Capital: $5,000,000.00</strong></p>
+            <p>Starting Capital: $5,000,000.00</p>
             <p>Investment Period: 3 Years</p>
         </div>
 
@@ -28,12 +27,12 @@
 
             <label for="projectCost">Project Cost ($):</label>
             <input type="number" id="projectCost" step="0.01" required><br>
-            
+
             <label for="cycleTime">Cycle Time (Weeks):</label>
             <input type="number" id="cycleTime" step="1" required><br>
-
-             <div id="salesPriceDisplay"></div>
-
+        
+            <div id="salesPriceDisplay"></div>
+        
             <button type="submit">Calculate Profit</button>
         </form>
 
@@ -43,7 +42,8 @@
             <p>Profit Per Unit (20%): $<span id="resultProfitPerCycle"></span></p>
             <p>Number of Cycles Completed: <span id="resultNumCycles"></span></p>
             <p>Total Units Produced (3 Years): <span id="resultTotalUnits"></span></p>
-            <p><strong>Total Estimated Profit ( Years): $<span id="resultTotalProfit"></span></strong></p>
+            <p><strong>Gross Income (3 Years): $<span id="resultGrossIncome"></span></strong></p>
+            <p><strong>Net Profit (3 Years): $<span id="resultTotalProfit"></span></strong></p>
             <p><i>Note: This calculation reinvests profits from each cycle and stops if capital is insufficient for the next cycle's cost.</i></p>
         </div>
 
@@ -62,7 +62,7 @@
             Enter your name and the project details (cost and cycle time) in the form on the left.
         </p>
         <p>
-            Click "Calculate Profit" to see the estimated profit over two years based on the initial capital and reinvested profits.
+            Click "Calculate Profit" to see the estimated profit over three years based on the initial capital and reinvested profits.
         </p>
         <p>
             The results are shown in the leaderboard, sorted by profit. Use the reset button to clear it.
