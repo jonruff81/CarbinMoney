@@ -48,7 +48,7 @@ function saveLeaderboard(leaderboard) {
     // This function is no longer needed as we write directly to Firebase
 }
 
-function updateLeaderboard(firstName, lastName, profit, units, projectCost,  cycleTime) {
+function updateLeaderboard(firstName, lastName, profit, units, projectCost, cycleTime, cyclesCompleted) {
     const name = `${firstName} ${lastName}`;
     const newEntry = {
         name,
@@ -56,6 +56,7 @@ function updateLeaderboard(firstName, lastName, profit, units, projectCost,  cyc
         units,
         projectCost,
         cycleTime,
+        cyclesCompleted,
         timestamp: Date.now() // Use Firebase server timestamp if preferred: firebase.database.ServerValue.TIMESTAMP
     };
 
@@ -93,13 +94,13 @@ function displayLeaderboard() {
                 const li = document.createElement('li');
                 // Ensure all expected properties exist before formatting
                 const pc = entry.projectCost !== undefined ? formatNumber(entry.projectCost) : 'N/A';
-                const lc = 'N/A';
-                const ct = entry.cycleTime !== undefined ? cycleTime : 'N/A';
+                const ct = entry.cycleTime !== undefined ? entry.cycleTime : 'N/A';
+                const cc = entry.cyclesCompleted !== undefined ? entry.cyclesCompleted : 'N/A';
 
                 li.innerHTML = `
                     <strong>${index + 1}. ${entry.name}</strong><br>
                     Profit: $${formatNumber(entry.profit)} | Units: ${formatInteger(entry.units)}<br>
-                    <small>Inputs: PC: $${pc} | LC: $${lc} | CT: ${ct}w</small>
+                    <small>Inputs: PC: $${pc} | CT: ${ct}w | CC: ${cc}</small>
                 `;
                 listElement.appendChild(li);
             });
@@ -147,7 +148,6 @@ document.addEventListener('DOMContentLoaded', () => {
     } else {
         console.error("Reset button not found in HTML.");
     }
-
 
     const calculatorForm = document.getElementById('calculator-form');
     calculatorForm.addEventListener('submit', function(event) {
@@ -245,7 +245,7 @@ document.addEventListener('DOMContentLoaded', () => {
         console.log("Results section displayed."); // Log 14
 
         // Update leaderboard in Firebase (which will trigger display update)
-        updateLeaderboard(firstName, lastName, totalAccumulatedProfit, totalUnitsProduced, projectCost, cycleTime);
+        updateLeaderboard(firstName, lastName, totalAccumulatedProfit, totalUnitsProduced, projectCost, parseInt(document.getElementById('cycleTime').value), cyclesCompleted);
         console.log("Leaderboard update triggered."); // Log 15
     });
 });
