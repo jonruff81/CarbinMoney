@@ -95,7 +95,7 @@ function displayLeaderboard() {
                 // Ensure all expected properties exist before formatting
                 const pc = entry.projectCost !== undefined ? formatNumber(entry.projectCost) : 'N/A';
                 const lc = entry.laborCost !== undefined ? formatNumber(entry.laborCost) : 'N/A';
-                const ct = entry.cycleTime !== undefined ? entry.cycleTime : 'N/A';
+                const ct = entry.cycleTime !== undefined ? cycleTime : 'N/A';
 
                 li.innerHTML = `
                     <strong>${index + 1}. ${entry.name}</strong><br>
@@ -150,32 +150,58 @@ document.addEventListener('DOMContentLoaded', () => {
     document.getElementById('calculator-form').addEventListener('submit', function(event) {
         event.preventDefault(); // Prevent the default form submission
 
+        console.log("Form submitted. Starting calculation."); // Log 1
+
         // Get user inputs
         const firstName = document.getElementById('firstName').value;
         const lastName = document.getElementById('lastName').value;
         const projectCost = parseFloat(document.getElementById('projectCost').value);
-        const laborCost = parseFloat(document.getElementById('laborCost').value);
+	const laborCost = parseFloat(document.getElementById('laborCost').value);
         const cycleTime = parseInt(document.getElementById('cycleTime').value);
+
+        console.log("Inputs:", { firstName, lastName, projectCost,laborCost, cycleTime }); // Log 2
+
+        // Calculate sales price
+        const salesPrice = projectCost * (1 + 0.20);
+
+        console.log("Sales price calculated:", salesPrice); // Log 3
+
+        // Display sales price
+        const salesPriceDisplayElement = document.getElementById('salesPriceDisplay');
+        if (salesPriceDisplayElement) {
+            salesPriceDisplayElement.textContent = `Sales Price: $${formatNumber(salesPrice)}`;
+            console.log("Sales price displayed."); // Log 4
+        } else {
+            console.error("Error: salesPriceDisplay element not found!"); // Log 5
+        }
+
 
         // Basic validation
         if (!firstName || !lastName) {
             alert('Please enter both first and last name.');
+            console.log("Validation failed: Missing name."); // Log 6
             return;
         }
         if (isNaN(projectCost) || projectCost <= 0 || isNaN(laborCost) || laborCost < 0 || isNaN(cycleTime) || cycleTime <= 0) {
             alert('Please enter valid positive numbers for costs and cycle time.');
+            console.log("Validation failed: Invalid inputs."); // Log 7
             return;
         }
 
+        console.log("Validation passed. Proceeding with simulation."); // Log 8
+
         // Constants & Initial State
-        const investmentPeriodWeeks = 2 * 52;
-        const profitMargin = 0.10;
-        let currentCapital = 1000000.00;
+        const investmentPeriodWeeks = 3 * 52; // Updated investment period
+        const profitMargin = 0.20; // Updated profit margin
+        let currentCapital = 5000000.00; // Updated starting capital
         let totalAccumulatedProfit = 0;
         let cyclesCompleted = 0;
         let totalUnitsProduced = 0;
         const totalCostPerUnit = projectCost + laborCost;
         const maxPossibleCycles = Math.floor(investmentPeriodWeeks / cycleTime);
+
+        console.log("Initial state:", { investmentPeriodWeeks, profitMargin, currentCapital, totalCostPerUnit, maxPossibleCycles }); // Log 9
+
 
         // Simulation Loop
         for (let i = 0; i < maxPossibleCycles; i++) {
@@ -188,11 +214,14 @@ document.addEventListener('DOMContentLoaded', () => {
                 totalAccumulatedProfit += actualCycleProfit;
                 totalUnitsProduced += unitsThisCycle;
                 cyclesCompleted++;
+                console.log(`Cycle ${i + 1}: Units=${unitsThisCycle}, Profit=${actualCycleProfit}, Capital=${currentCapital}`); // Log 10
             } else {
-                console.log(`Stopping after ${cyclesCompleted} cycles due to insufficient capital for a single unit.`);
+                console.log(`Stopping after ${cyclesCompleted} cycles due to insufficient capital for a single unit.`); // Log 11
                 break;
             }
         }
+
+        console.log("Simulation complete. Final results:", { totalAccumulatedProfit, totalUnitsProduced, cyclesCompleted }); // Log 12
 
         // Display results with formatting
         document.getElementById('resultName').textContent = `${firstName} ${lastName}`;
@@ -202,10 +231,15 @@ document.addEventListener('DOMContentLoaded', () => {
         document.getElementById('resultTotalUnits').textContent = formatInteger(totalUnitsProduced);
         document.getElementById('resultTotalProfit').textContent = formatNumber(totalAccumulatedProfit);
 
+        console.log("Results displayed."); // Log 13
+
         // Show the results section
         document.getElementById('results').style.display = 'block';
 
+        console.log("Results section displayed."); // Log 14
+
         // Update leaderboard in Firebase (which will trigger display update)
         updateLeaderboard(firstName, lastName, totalAccumulatedProfit, totalUnitsProduced, projectCost, laborCost, cycleTime);
+        console.log("Leaderboard update triggered."); // Log 15
     });
 });
