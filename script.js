@@ -94,8 +94,8 @@ function displayLeaderboard() {
                 const li = document.createElement('li');
                 // Ensure all expected properties exist before formatting
                 const pc = entry.projectCost !== undefined ? formatNumber(entry.projectCost) : 'N/A';
-                const ct = entry.cycleTime !== undefined ? formatInteger(entry.cycleTime) : 'N/A';
-                const cc = entry.cyclesCompleted !== undefined ? entry.cyclesCompleted : 'N/A';
+                const ct = entry.cycleTime !== undefined ? formatNumber(entry.cycleTime) : 'N/A';
+                const cc = entry.cyclesCompleted !== undefined ? formatInteger(entry.cyclesCompleted) : 'N/A';
 
                 li.innerHTML = `
                     <strong>${index + 1}. ${entry.name}</strong><br>
