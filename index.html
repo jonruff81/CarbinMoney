@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Carbin Investments</title>
+    <title>Construction Cycle</title>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
@@ -13,10 +13,9 @@
 
         <div class="initial-conditions">
             <h2>Initial Conditions</h2>
-            <p>Bank Loan: $750,000.00</p>
-            <p>Johnny's Money: $250,000.00</p>
-            <p><strong>Total Starting Capital: $1,000,000.00</strong></p>
-            <p>Investment Period: 2 Years</p>
+            <p>Starting Capitol: $5,000,000.00</p>
+            <p><strong>Total Starting Capital: $5,000,000.00</strong></p>
+            <p>Investment Period: 3 Years</p>
         </div>
 
         <form id="calculator-form">
@@ -29,12 +28,11 @@
 
             <label for="projectCost">Project Cost ($):</label>
             <input type="number" id="projectCost" step="0.01" required><br>
-
-            <label for="laborCost">Labor Cost ($):</label>
-            <input type="number" id="laborCost" step="0.01" required><br>
-
+            
             <label for="cycleTime">Cycle Time (Weeks):</label>
             <input type="number" id="cycleTime" step="1" required><br>
+
+             <div id="salesPriceDisplay"></div>
 
             <button type="submit">Calculate Profit</button>
         </form>
@@ -42,10 +40,10 @@
         <div id="results" style="display: none;">
             <h2>Results for <span id="resultName"></span></h2>
             <p>Total Cost Per Unit: $<span id="resultTotalCost"></span></p>
-            <p>Profit Per Unit (10%): $<span id="resultProfitPerCycle"></span></p>
+            <p>Profit Per Unit (20%): $<span id="resultProfitPerCycle"></span></p>
             <p>Number of Cycles Completed: <span id="resultNumCycles"></span></p>
-            <p>Total Units Produced (2 Years): <span id="resultTotalUnits"></span></p>
-            <p><strong>Total Estimated Profit (2 Years): $<span id="resultTotalProfit"></span></strong></p>
+            <p>Total Units Produced (3 Years): <span id="resultTotalUnits"></span></p>
+            <p><strong>Total Estimated Profit ( Years): $<span id="resultTotalProfit"></span></strong></p>
             <p><i>Note: This calculation reinvests profits from each cycle and stops if capital is insufficient for the next cycle's cost.</i></p>
         </div>
 
@@ -61,7 +59,7 @@
     <div id="instructions">
         <h2>How to Use</h2>
         <p>
-            Enter your name and the project details (cost, labor, cycle time) in the form on the left.
+            Enter your name and the project details (cost and cycle time) in the form on the left.
         </p>
         <p>
             Click "Calculate Profit" to see the estimated profit over two years based on the initial capital and reinvested profits.
